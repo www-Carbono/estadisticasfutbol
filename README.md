@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Proyecto Web de Estadísticas de Fútbol
 
-## Getting Started
+estadisticasfutbol.com es un proyecto que consiste en una página web que permite ver a los usuarios las estadísticas de los partidos de fútbol en los próximos dias y filtrar partidos por diferentes estadísticas (mayor porcentaje de goles esperados, tarjetas amarillas, etc.) y también podrás buscar y examinar estádisticas de un equipo en concreto o examinar resultados de otros partidos y temporadas.
 
-First, run the development server:
+## Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Página Principal**:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   - [] Listado de partidos de fútbol del día.
+   - [] Filtros para ordenar y buscar partidos según diferentes estadísticas (porcentaje de goles esperados, tarjetas amarillas, etc.).
+   - [] Buscador con filtros para una búsqueda más precisa.
+   - [] En los detalles del partido, estadisticas de ambos equipos, estadisticas media entre ambos equipos y h2h entre ambos equipos.
+   - [] Clasificación de la liga?? (Si es una liga.)
+   - [] En la Lista de Partidos, poner en una columna el arbitro del partido y al pasar el raton por encima que aparezca un Popup con las estadisticas del arbitro (o que al hacer click nos de sus stats)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Página de Equipos**:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+   - [] Tabla con información basica de todos los equipos
+   - [] Información detallada de cada equipo (% de partidos con 2,5 goles , media de corners , media de porterias a cero etc.)
+   - [] Dentro del detalle de los equipos, en un lateral, en que posición de la liga se encuentran.
 
-## Learn More
+3. **Página de Jugadores**:
 
-To learn more about Next.js, take a look at the following resources:
+   - [] Tabla con información basica de todos los jugadores registrados.
+   - [] Información detallada de cada jugador (goles, minutos jugados etc, equipos jugados, posicion en el campo...)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Historial de Partidos**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+   - [] Tabla con información basica de todos los partidos registrados en nuestra base de datos
+   - [] Buscador con Filtros para filtrar ya sea por equipos o por fechas.
+   - [] Información detallada de cada partido (Resultado, goleadores , estadisticas del partido...)
 
-## Deploy on Vercel
+5. **Partidos en Juego**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   - [] Tabla con todos los partidos en juego, pudiendo de forma rápida ver el resultado actual del partido.
+   - [] Información detallada del partido en juego (estadisticas, resultados , alineacion , cambios...)
