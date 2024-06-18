@@ -9,11 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.35",
+    "cheerio": "1.0.0-rc.12",
+    "mongodb": "^6.7.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.35",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
