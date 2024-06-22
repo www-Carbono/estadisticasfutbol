@@ -5,7 +5,6 @@ import { MongoClient, ServerApiVersion } from 'mongodb'
 // type Element = cheerio.Element
 export const GET = async () => {
   const CalendarDataNext: saveDatabase[] = await GetCalendarData('#content > div.prevnext > a.button2.next')
-  console.log(CalendarDataNext)
   await SaveData(CalendarDataNext, true)
   const CalendarDataPlayed: saveDatabase[] = await GetCalendarData('#content > div.prevnext > a.button2.prev')
   await SaveData(CalendarDataPlayed, false)
