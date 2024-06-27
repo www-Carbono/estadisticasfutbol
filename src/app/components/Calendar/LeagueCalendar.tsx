@@ -7,6 +7,7 @@ interface Props {
 }
 
 export const LeagueCalendar: React.FC<Props> = ({ Matches, MatchesFilter }) => {
+  console.log(MatchesFilter)
   return (
     <div className='space-y-4'>
       {Matches &&

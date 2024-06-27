@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import { removeBackground, Config } from '@imgly/background-removal-node'
-import { headers } from 'next/headers'
 
 const IsValidImage = async (imageUrl: string) => {
   const data = await fetch(imageUrl)
@@ -33,9 +32,9 @@ const ConvertImage = async (imageUrl: string) => {
   return bufferBase64
 }
 
-export const POST = async (req: NextApiRequest, res: NextApiResponse) => {
+export const POST = async (req: Request, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    const body = await req.json() // Utiliza req.json() para obtener el cuerpo de la solicitud
+    const body = await req.json()
     const { imageUrl } = body
 
     console.log(imageUrl)
