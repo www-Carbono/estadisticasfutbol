@@ -4,7 +4,7 @@ export const POST = async () => {
   return Calendar
 }
 
-export const GetCalendar = async () => {
+const GetCalendar = async () => {
   const client = new MongoClient(process.env.DB_URL ?? '', {
     serverApi: {
       version: ServerApiVersion.v1,
