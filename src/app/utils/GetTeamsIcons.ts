@@ -1,7 +1,7 @@
 'use server'
 export const GetTeamsIcons = async (url: string) => {
   // const LINK = 'http://localhost:3333/RemoveBackground'
-  const LINK = 'http://localhost:3000/api/test'
+  const LINK = `${process.env.API_DOMAIN}/api/test`
   const request = await fetch(LINK, {
     method: 'POST',
     headers: {
