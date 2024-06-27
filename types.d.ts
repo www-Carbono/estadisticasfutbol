@@ -195,19 +195,24 @@ export interface TeamPorteroData {
 }
 
 export interface CalendarMatches {
+  MatchId: string
   DateElements?: string
   LeagueName: string
+  LeagueIcon: string | undefined
+  LeagueRegion: string | undefined
   LeagueId: string | undefined
   Ronda: string
   Jornada: string
   Hora: string
   Local: string
+  LocalTeamImage: string | undefined
   LocalTeamId: string | undefined
   LocalXG: string
   GolesLocal: number | null
   GolesVisitante: number | null
   VisitanteXG: string
   Visitante: string
+  AwayTeamImage: string | undefined
   VisitanteTeamId: string | undefined
   Asistencia: string
   Estadio: string

@@ -18,11 +18,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
     rgb(var(--background-start-rgb));
 }
 
@@ -30,4 +26,192 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.carousel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 20px auto;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.selected {
+  border: 1px solid #c3cc5a;
+  color: #c3cc5a;
+}
+
+.dateSelector {
+  font-size: 12px;
+  width: 94px;
+  height: 39px;
+  line-height: 12px;
+}
+
+.btn-conteiner {
+  display: flex;
+  justify-content: center;
+  --color-text: #c3cc5a;
+  --color-background: #353535;
+  --color-outline: #c3cc5a;
+  --color-shadow: #00000080;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  padding: 0px 3px;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 25px;
+  color: #c3cc5a;
+  background: var(--color-background);
+  transition: 1s;
+  border-radius: 100px;
+  box-shadow: 0 0 0.2em 0 var(--color-background);
+}
+
+.btn-content-no-Animated {
+  display: flex;
+  align-items: center;
+  padding: 0px 3px;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 25px;
+  color: #c3cc5a;
+  background: var(--color-background);
+  border-radius: 100px;
+  box-shadow: 0 0 0.2em 0 var(--color-background);
+  outline: 0.1em solid transparent;
+  outline-offset: 0.2em;
+  box-shadow: 0 0 0.4em 0 var(--color-background);
+  transform: scale(0.8);
+  padding: 0px 7px;
+}
+
+.btn-content:hover,
+.btn-content:focus {
+  transition: 0.5s;
+  -webkit-animation: btn-content 1s;
+  animation: btn-content 1s;
+  outline: 0.1em solid transparent;
+  outline-offset: 0.2em;
+  box-shadow: 0 0 0.4em 0 var(--color-background);
+  /* transform: scale(0.6); */
+}
+
+.btn-content .icon-arrow {
+  transition: 0.5s;
+  margin-right: 0px;
+  /* transform: scale(0.6); */
+}
+
+.btn-content:hover .icon-arrow {
+  transition: 0.5s;
+  margin-right: 25px;
+}
+
+.icon-arrow {
+  width: 20px;
+  margin-left: 15px;
+  position: relative;
+}
+
+/* SVG */
+#arrow-icon-one {
+  transition: 0.4s;
+  transform: translateX(-60%);
+}
+
+#arrow-icon-two {
+  transition: 0.5s;
+  transform: translateX(-30%);
+}
+
+.btn-content:hover #arrow-icon-three {
+  animation: color_anim 1s infinite 0.2s;
+}
+
+.btn-content:hover #arrow-icon-one {
+  transform: translateX(0%);
+  animation: color_anim 1s infinite 0.6s;
+}
+
+.btn-content:hover #arrow-icon-two {
+  transform: translateX(0%);
+  animation: color_anim 1s infinite 0.4s;
+}
+
+/* SVG animations */
+@keyframes color_anim {
+  0% {
+    fill: white;
+  }
+
+  50% {
+    fill: var(--color-background);
+  }
+
+  100% {
+    fill: #c3cc5a;
+  }
+}
+
+@-webkit-keyframes btn-content {
+  0% {
+    outline: 0.2em solid var(--color-background);
+    outline-offset: 0;
+  }
+}
+
+@keyframes btn-content {
+  0% {
+    outline: 0.2em solid var(--color-background);
+    outline-offset: 0;
+  }
+}
+
+.dateSelectorCalendar {
+  font-size: 12px;
+  width: 94px;
+  height: 39px;
+  line-height: 12px;
+  color: #c3cc5a;
+  border: 1px solid #c3cc5a;
+}
+
+.animationSelector:hover {
+  animation: CalendarSelectorAnimation 0.5s ease 0s 1 normal forwards;
+}
+
+@keyframes CalendarSelectorAnimation {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.headerLeague {
+  font-size: 12px;
+  height: 35px;
+}
+
+.roundText {
+  color: #808080;
+}
+
+.LeagueHeader {
+  border: 1px solid #171717;
+  font-size: 14px;
+  border-bottom: 10px !important;
 }

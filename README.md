@@ -1,3 +1,8 @@
+TODO:
+
+- Obtener de la API Imagenes de los equipos y de la Liga.
+- Agregar a la API un MatchId.
+
 # EstadisticasFutbol.com
 
 Bienvenido a **EstadisticasFutbol.com**, tu fuente definitiva para todas las estadísticas y datos relacionados con el fútbol. Este proyecto está construido con Next.js y ofrece una amplia gama de funcionalidades para analizar equipos, jugadores, árbitros y partidos de fútbol.
