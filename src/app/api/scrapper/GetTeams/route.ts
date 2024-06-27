@@ -1,4 +1,4 @@
-import { cheerioLoad } from '../GetCalendar/route'
+import { cheerioLoad } from '@/app/utils/CheerioLoad'
 
 export const GET = async () => {
   const LINK = process.env.TEAMS_LINK ?? ''

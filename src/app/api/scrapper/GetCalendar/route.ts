@@ -1,8 +1,8 @@
-import * as cheerio from 'cheerio'
 import { CalendarMatches, saveDatabase } from '../../../../../types'
 import { MongoClient, ServerApiVersion } from 'mongodb'
 import { randomUUID } from 'crypto'
 import { GetTeamsIcons } from '@/app/utils/GetTeamsIcons'
+import { cheerioLoad } from '@/app/utils/CheerioLoad'
 
 // type Element = cheerio.Element
 export const GET = async () => {
@@ -43,13 +43,13 @@ const SaveData = async (dataToSave: saveDatabase[], remove: boolean) => {
   await client.db('EstadisticasFutbol').collection('Calendar').insertMany(dataToSave)
 }
 
-export const cheerioLoad = async (URL: string) => {
-  console.log(URL)
-  const RequestToScrape = await fetch(URL, { cache: 'no-store' })
-  const RequestToText = await RequestToScrape.text()
-  const $ = cheerio.load(RequestToText)
-  return $
-}
+// export const cheerioLoad = async (URL: string) => {
+//   console.log(URL)
+//   const RequestToScrape = await fetch(URL, { cache: 'no-store' })
+//   const RequestToText = await RequestToScrape.text()
+//   const $ = cheerio.load(RequestToText)
+//   return $
+// }
 async function GetCalendarData(selector: string) {
   const CalendarData = []
   const BASEURL = process.env.URL_CALENDAR ?? ''
