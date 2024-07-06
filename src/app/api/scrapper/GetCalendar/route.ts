@@ -1,16 +1,18 @@
-import { CalendarMatches, saveDatabase } from '../../../../../types'
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import { CalendarMatches, Team, saveDatabase } from '../../../../../types'
+// import { MongoClient, ServerApiVersion } from 'mongodb'
 import { randomUUID } from 'crypto'
-import { GetTeamsIcons } from '@/app/utils/GetTeamsIcons'
+import { GetTeamsIcons } from '@/app/services/GetTeamsIcons'
 import { cheerioLoad } from '@/app/utils/CheerioLoad'
+import { AddTeamService, GetTeamService } from '@/app/services/Teams'
+import { AddCalendarData } from '@/app/services/Calendar'
 
 // type Element = cheerio.Element
 export const GET = async () => {
   const CalendarDataNext: saveDatabase[] = await GetCalendarData('#content > div.prevnext > a.button2.next')
   const CalendarDataPlayed: saveDatabase[] = await GetCalendarData('#content > div.prevnext > a.button2.prev')
   CalendarDataPlayed.shift()
-  await SaveData(CalendarDataNext, true)
-  await SaveData(CalendarDataPlayed, false)
+  await AddCalendarData(true, CalendarDataNext)
+  await AddCalendarData(false, CalendarDataPlayed)
 
   return Response.json({ reponse: 'Calendario Actualizado Correctamente' })
 }
@@ -27,35 +29,12 @@ const GetTodayDate = () => {
   return fechaFormateada
 }
 
-const SaveData = async (dataToSave: saveDatabase[], remove: boolean) => {
-  const client = new MongoClient(process.env.DB_URL ?? '', {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true
-    }
-  })
-  await client.connect()
-  if (remove) {
-    await client.db('EstadisticasFutbol').collection('Calendar').deleteMany({})
-  }
-
-  await client.db('EstadisticasFutbol').collection('Calendar').insertMany(dataToSave)
-}
-
-// export const cheerioLoad = async (URL: string) => {
-//   console.log(URL)
-//   const RequestToScrape = await fetch(URL, { cache: 'no-store' })
-//   const RequestToText = await RequestToScrape.text()
-//   const $ = cheerio.load(RequestToText)
-//   return $
-// }
 async function GetCalendarData(selector: string) {
   const CalendarData = []
   const BASEURL = process.env.URL_CALENDAR ?? ''
   const TodayDate = GetTodayDate()
   const URLDAYS = [`${BASEURL}/es/partidos/${TodayDate}`]
-  const DAYSTOGET = 2
+  const DAYSTOGET = 15
   let DAYS = 0
   let newDate: string | undefined = URLDAYS[0]
   while (DAYS <= DAYSTOGET) {
@@ -88,10 +67,17 @@ async function GetCalendarData(selector: string) {
       const elements = $(elementTable).find('.table_container > table > tbody > tr').toArray()
 
       for (const data of elements) {
-        console.log('Inicio')
-        const LocalTeamImage = await GetTeamImage(BASEURL, $, data, 'home_team')
-        await new Promise((r) => setTimeout(r, 10200))
-        const AwayTeamImage = await GetTeamImage(BASEURL, $, data, 'away_team')
+        const Local = $(data).find('[data-stat="home_team"]').find('a').text()
+        if (Local.trim().length < 1) {
+          continue
+        }
+        const Visitante = $(data).find('[data-stat="away_team"]').find('a').text()
+        const LocalTeamImage = await GetTeamImage(BASEURL, $, data, 'home_team', Local)
+        const AwayTeamImage = await GetTeamImage(BASEURL, $, data, 'away_team', Visitante)
+
+        if (Local === undefined) {
+          break
+        }
 
         Partidos.push({
           LeagueName,
@@ -102,7 +88,7 @@ async function GetCalendarData(selector: string) {
           Ronda: $(data).find('[data-stat="round"]').text(),
           Jornada: $(data).find('[data-stat="gameweek"]').text(),
           Hora: $(data).find('[data-stat="start_time"]').find('.venuetime').text(),
-          Local: $(data).find('[data-stat="home_team"]').find('a').text(),
+          Local,
           LocalTeamImage,
           LocalTeamId: $(data).find('[data-stat="home_team"]').find('a').attr('href')?.split('/')[3],
           LocalXG: $(data).find('[data-stat="home_xg"]').text(),
@@ -115,7 +101,7 @@ async function GetCalendarData(selector: string) {
               ? Number($(data).find('[data-stat="score"]').find('a').text().split('–')[1])
               : null,
           VisitanteXG: $(data).find('[data-stat="away_xg"]').text(),
-          Visitante: $(data).find('[data-stat="away_team"]').find('a').text(),
+          Visitante,
           AwayTeamImage,
           VisitanteTeamId: $(data).find('[data-stat="away_team"]').find('a').attr('href')?.split('/')[3],
           Asistencia: $(data).find('[data-stat="attendance"]').text(),
@@ -124,7 +110,6 @@ async function GetCalendarData(selector: string) {
           EstadoDelPartido:
             $(data).find('[data-stat="score"]').find('a').text().length > 1 ? 'Finalizado' : 'No Empezado'
         })
-        console.log('Termina await')
       }
     }
 
@@ -132,28 +117,49 @@ async function GetCalendarData(selector: string) {
       DateElement,
       Partidos: Partidos
     })
-    // console.log(CalendarData)
     DAYS++
     await new Promise((r) => setTimeout(r, 10200))
     console.log(`${DAYS}/${DAYSTOGET}`)
   }
   return CalendarData
 }
-async function GetTeamImage(BASEURL: string, $: cheerio.Root, data: cheerio.Element, team: string) {
+async function GetTeamImage(
+  BASEURL: string,
+  $: cheerio.Root,
+  data: cheerio.Element,
+  team: string,
+  teamName: string
+) {
   const localTeamLink = `${BASEURL}${$(data).find(`[data-stat="${team}"]`).find('a').attr('href')}`
-  const localTeamTab = await cheerioLoad(localTeamLink)
-  const GetLocalTeamCode = localTeamTab(`#meta > div.media-item.country > span`)
-    .attr('class')
-    ?.split(' ')[1]
-    .split('-')[1]
-    .toUpperCase()
-  const localTeamImage =
-    localTeamTab('#meta > div.media-item.logo > img').attr('src') !== undefined
-      ? localTeamTab('#meta > div.media-item.logo > img').attr('src')
-      : `https://flagsapi.com/${GetLocalTeamCode}/flat/64.png`
+  const TeamId = localTeamLink.split('/')[5]
+  const CheckIfTeamExists: Team = await GetTeamService(TeamId)
+  if (CheckIfTeamExists !== null) {
+    return CheckIfTeamExists.TeamImage
+  } else {
+    await new Promise((r) => setTimeout(r, 10200))
+    const localTeamTab = await cheerioLoad(localTeamLink)
+    const GetLocalTeamCode = localTeamTab(`#meta > div.media-item.country > span`)
+      .attr('class')
+      ?.split(' ')[1]
+      .split('-')[1]
+      .toUpperCase()
+    const localTeamImage =
+      localTeamTab('#meta > div.media-item.logo > img').attr('src') !== undefined
+        ? localTeamTab('#meta > div.media-item.logo > img').attr('src')
+        : `https://flagsapi.com/${GetLocalTeamCode}/flat/64.png`
 
-  console.log(localTeamImage)
-  const teamImage = GetTeamsIcons(localTeamImage as string)
+    const teamImage = await GetTeamsIcons(localTeamImage as string)
 
-  return teamImage
+    //Guardar en la base de datos
+    const Data = [
+      {
+        TeamName: teamName,
+        TeamId: TeamId,
+        TeamImage: teamImage
+      }
+    ]
+    await AddTeamService(Data)
+
+    return teamImage
+  }
 }

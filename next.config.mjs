@@ -20,6 +20,7 @@ const nextConfig = {
       }
     ]
   },
+  reactStrictMode: false,
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push({

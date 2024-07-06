@@ -36,9 +36,6 @@ export const POST = async (req: Request, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const body = await req.json()
     const { imageUrl } = body
-
-    console.log(imageUrl)
-
     if (!imageUrl) {
       return Response.json({ error: 'Image URL is required' })
     }

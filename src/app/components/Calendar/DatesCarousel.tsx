@@ -1,7 +1,7 @@
 import { NextIcon } from './Icons'
 
 interface Props {
-  calendarDays: string[][]
+  calendarDates: (number | string)[][]
   handlePrev: () => void
   handleNext: () => void
   renderDates: () => JSX.Element[]
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const DatesCarousel: React.FC<Props> = ({
-  calendarDays,
+  calendarDates,
   handlePrev,
   handleNext,
   renderDates,
@@ -17,7 +17,7 @@ export const DatesCarousel: React.FC<Props> = ({
 }) => {
   return (
     <div className='carousel'>
-      {calendarDays && (
+      {calendarDates && (
         <div className='carousel'>
           <button
             onClick={handlePrev}
@@ -32,10 +32,10 @@ export const DatesCarousel: React.FC<Props> = ({
 
           <button
             onClick={handleNext}
-            disabled={renderDates().length < 6 && currentIndex > 28}
-            className={renderDates().length < 6 && currentIndex > 28 ? '' : 'btn-content'}
+            disabled={renderDates().length < 6 && currentIndex > 27}
+            className={renderDates().length < 6 && currentIndex > 27 ? '' : 'btn-content'}
           >
-            <NextIcon color={renderDates().length < 6 && currentIndex > 28 ? '#aaa' : '#c3cc5a'} />
+            <NextIcon color={renderDates().length < 6 && currentIndex > 27 ? '#aaa' : '#c3cc5a'} />
           </button>
         </div>
       )}

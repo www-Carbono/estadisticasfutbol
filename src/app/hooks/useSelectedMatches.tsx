@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react'
 import { saveDatabase } from '../../../types'
 import { GetCurrentDate } from '../utils/GetCurrentDate'
-import { GetCalendarService } from '../services/GetCalendarService'
+import { GetCalendarDates, GetCalendarService } from '../services/Calendar'
 import { SortCalendar } from '../utils/sortCalendar'
 import { ChangeEvent } from 'react'
 import { DayConverter } from '../utils/DayConverter'
 import { CalendarMatches } from '../../../types'
+// import { UseLoading } from '../providers/LoaderProvider'
 
 export const useSelectedMatches = () => {
-  const [calendar, setCalendar] = useState<saveDatabase[]>()
-  const [calendarDays, setCalendarDays] = useState<string[][]>([])
+  const [calendarDates, setCalendarDates] = useState<(string | number)[][]>([])
+
+  const [calendar, setCalendar] = useState<saveDatabase>()
   const [DataSelected, setDataSelected] = useState<string>(GetCurrentDate())
   const [filter, setFilter] = useState({
     selectedTypeGame: '',
-    search: '',
-    selectTeamOrGame: ''
+    search: ''
   })
+
+  const [isCalendarLoaded, setIsCalendarLoaded] = useState(false)
+  const [isMatchesLoaded, setIsMatchesLoaded] = useState(false)
 
   // DatesCarrousel
   const [currentIndex, setCurrentIndex] = useState<number>(18)
@@ -25,21 +29,30 @@ export const useSelectedMatches = () => {
   //Tercer file
   const [Matches, setMatches] = useState<CalendarMatches[][]>()
   const [matchesFilter, setMatchesFilter] = useState<CalendarMatches[]>([])
+  const [matchesFilterOrderer, setMatchesFilterOrderer] = useState<CalendarMatches[][]>([])
 
   const FetchCalendar = async () => {
-    const data = await GetCalendarService()
+    const CalendarDates = await GetCalendarDates()
+    const data = await GetCalendarService(DataSelected)
+    setCalendarDates(SortCalendar(CalendarDates.response))
     setCalendar(data.response)
+    setIsCalendarLoaded(true)
+    setIsMatchesLoaded(true)
   }
   useEffect(() => {
     FetchCalendar()
   }, [])
 
   useEffect(() => {
-    if (calendar !== undefined && calendar?.length > 0) {
-      const CalendarAndDates = SortCalendar(calendar)
-      setCalendarDays(CalendarAndDates as string[][])
+    setIsMatchesLoaded(false)
+    const Fetch = async () => {
+      console.log(DataSelected)
+      const data = await GetCalendarService(DataSelected)
+      setCalendar(data.response)
+      setIsMatchesLoaded(true)
     }
-  }, [calendar])
+    Fetch()
+  }, [DataSelected])
 
   const onChangeForm = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -52,21 +65,64 @@ export const useSelectedMatches = () => {
 
   useEffect(() => {
     if (calendar !== undefined) {
-      const FilterData = calendar.filter((element: saveDatabase) => element.DateElement === DataSelected)[0]
-      const DataFiltered = FilterData.Partidos.filter((Match) => Match.Local.includes(filter.search))
+      const DataFiltered = calendar.Partidos.filter((Match) => {
+        if (filter.selectedTypeGame === '') {
+          if (Match.Local.includes(filter.search)) {
+            return true
+          }
+          if (Match.Visitante.includes(filter.search)) {
+            return true
+          }
+        }
+
+        if (filter.selectedTypeGame === 'No Empezado') {
+          if (Match.Local.includes(filter.search) && Match.EstadoDelPartido === filter.selectedTypeGame) {
+            return true
+          }
+          if (Match.Visitante.includes(filter.search) && Match.EstadoDelPartido === filter.selectedTypeGame) {
+            return true
+          }
+        }
+
+        if (filter.selectedTypeGame === 'Finalizado') {
+          if (Match.Local.includes(filter.search) && Match.EstadoDelPartido === filter.selectedTypeGame) {
+            return true
+          }
+          if (Match.Visitante.includes(filter.search) && Match.EstadoDelPartido === filter.selectedTypeGame) {
+            return true
+          }
+        }
+      })
       setMatchesFilter(DataFiltered)
     }
-  }, [filter, calendar, DataSelected])
+  }, [filter, calendar, DataSelected, Matches])
 
   useEffect(() => {
-    if (calendarDays !== undefined && calendarDays.length > 0) {
-      const index = calendarDays.findIndex((subArray) => subArray.indexOf(fechaFormateada) !== -1)
+    const matchesFilterOrderer: { [key: string]: CalendarMatches[] } = {}
+    if (matchesFilter.length > 0) {
+      matchesFilter.map((match) => {
+        if (!matchesFilterOrderer[match.LeagueId as string]) {
+          matchesFilterOrderer[match.LeagueId as string] = []
+        }
+        matchesFilterOrderer[match.LeagueId as string].push(match)
+      })
+      // // const test = Object.values(matchesFilterOrderer)[0]
+      setMatchesFilterOrderer(Object.values(matchesFilterOrderer))
+    } else {
+      setMatchesFilterOrderer([])
+    }
+  }, [matchesFilter])
+
+  useEffect(() => {
+    if (calendarDates !== undefined && calendarDates.length > 0) {
+      const index = calendarDates.findIndex((subArray) => subArray.indexOf(fechaFormateada) !== -1)
       setSelected(index)
       setCurrentIndex(index)
     }
-  }, [calendarDays, fechaFormateada])
+  }, [calendarDates, fechaFormateada])
 
   const onClickButton = (i: number, event: React.MouseEvent<HTMLElement>) => {
+    // setIsCalendarLoaded(false)
     setSelected(i)
     const fecha: string = event.currentTarget.getAttribute('datatype') ?? ''
     setDataSelected(fecha)
@@ -74,8 +130,8 @@ export const useSelectedMatches = () => {
 
   const renderDates = () => {
     const items = []
-    const Fechas = calendarDays.map((element) => element[1])
-    const CantidadElementos = calendarDays.map((elemento) => elemento[0])
+    const Fechas = calendarDates.map((element) => element[0])
+    const CantidadElementos = calendarDates.map((elemento) => elemento[1])
     for (let i = currentIndex - 2; i <= currentIndex + 2; i++) {
       if (i >= 0 && i < Fechas.length) {
         items.push(
@@ -84,11 +140,11 @@ export const useSelectedMatches = () => {
             className={`carousel-item bg-zinc-700 text-white px-4 m-2  rounded-md font-bold dateSelector relative animationSelector ${
               selected === i ? 'selected' : ''
             }`}
-            datatype={Fechas[i]}
+            datatype={Fechas[i] as string}
             onClick={(event) => onClickButton(i, event)}
           >
             <p>{DayConverter(new Date(Fechas[i]).getDay())}</p>
-            <p>{Fechas[i].substring(5)}</p>
+            <p>{(Fechas[i] as string).substring(5)}</p>
             <p className='absolute bottom-0 right-0 -mx-2 -my-2 border-red-600 bg-red-500 rounded-full p-1 text-white text-xs'>
               {CantidadElementos[i]}
             </p>
@@ -106,20 +162,18 @@ export const useSelectedMatches = () => {
   }
 
   const handleNext = () => {
-    if (currentIndex < calendarDays.length - 1) {
+    if (currentIndex < calendarDates.length - 1) {
       setCurrentIndex(currentIndex + 1)
     }
   }
 
   useEffect(() => {
     if (calendar) {
-      const FilterData = calendar.filter((element: saveDatabase) => element.DateElement === DataSelected)[0]
-
       const Ligas: string[] = []
-      FilterData.Partidos.map((elemento) => Ligas.push(elemento.LeagueId as string))
+      calendar.Partidos.map((elemento) => Ligas.push(elemento.LeagueId as string))
 
       const groupedGames: { [key: string]: CalendarMatches[] } = {}
-      FilterData.Partidos.forEach((match) => {
+      calendar.Partidos.forEach((match) => {
         const leagueId: string | undefined = match?.LeagueId
 
         if (!groupedGames[leagueId as string]) {
@@ -135,14 +189,15 @@ export const useSelectedMatches = () => {
     calendar,
     onChangeForm,
     filter,
-    calendarDays,
+    calendarDates,
     setDataSelected,
     DataSelected,
     renderDates,
     handlePrev,
     handleNext,
     currentIndex,
-    Matches,
-    matchesFilter
+    matchesFilterOrderer,
+    isCalendarLoaded,
+    isMatchesLoaded
   }
 }

@@ -1,12 +1,6 @@
-import { saveDatabase } from '../../../types'
-
-export const SortCalendar = (calendar: saveDatabase[]) => {
-  const CalendarAndDates = calendar?.map((element) => [
-    element.Partidos.length.toString(),
-    element.DateElement
-  ])
-  CalendarAndDates.sort((a: string[], b: string[]) => {
-    return new Date(a[1]).getTime() - new Date(b[1]).getTime()
+export const SortCalendar = (calendar: string[][]) => {
+  calendar.sort((a: string[], b: string[]) => {
+    return new Date(a[0]).getTime() - new Date(b[0]).getTime()
   })
-  return CalendarAndDates
+  return calendar
 }

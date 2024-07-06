@@ -224,3 +224,10 @@ export interface saveDatabase {
   DateElement: string
   Partidos: CalendarMatches[]
 }
+
+export interface Team {
+  _id?: any
+  TeamImage: string
+  TeamId: string
+  TeamName: string
+}
